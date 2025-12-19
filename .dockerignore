@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*. so
+*. egg
+*.egg-info
+dist
+build
+venv
+env
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+
+# IDE
+.vscode
+.idea
+*. swp
+
+# Data
+data_cache/*. pkl
+data_cache/*.csv
+*. h5
+
+# Logs
+*.log
+
+# Documentation
+docs/_build
+site
+
+# OS
+.DS_Store
+Thumbs.db

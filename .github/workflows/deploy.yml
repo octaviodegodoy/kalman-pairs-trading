@@ -1,0 +1,64 @@
+name: Deploy Dashboard
+
+on:
+  push: 
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy-streamlit:
+    name: Deploy to Streamlit Cloud
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name:  Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deploy to Streamlit
+      run: |
+        echo "Dashboard deployment configured"
+        echo "Visit: https://share.streamlit.io/ to connect your repository"
+
+  deploy-heroku:
+    name: Deploy to Heroku
+    runs-on: ubuntu-latest
+    if: false  # Enable when ready
+    
+    steps: 
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name:  Deploy to Heroku
+      uses: akhileshns/heroku-deploy@v3.12.14
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: ${{ secrets. HEROKU_APP_NAME }}
+        heroku_email: ${{ secrets. HEROKU_EMAIL }}
+
+  deploy-docs:
+    name: Deploy Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name:  Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version:  '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install mkdocs mkdocs-material
+    
+    - name: Build docs
+      run: |
+        mkdocs build
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./site

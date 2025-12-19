@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build: .
+    container_name: kalman-pairs-dashboard
+    ports:
+      - "8501:8501"
+    volumes: 
+      - ./data_cache:/app/data_cache
+      - ./config.yaml:/app/config.yaml
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval:  30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  trader:
+    build: .
+    container_name: kalman-pairs-trader
+    command: python -m src.cli trade GLD/GDX --broker alpaca --paper
+    volumes:
+      - ./data_cache:/app/data_cache
+      - ./config.yaml:/app/config.yaml
+    environment:
+      - ALPACA_API_KEY=${ALPACA_API_KEY}
+      - ALPACA_API_SECRET=${ALPACA_API_SECRET}
+    restart: unless-stopped
+    depends_on:
+      - dashboard
+
+volumes:
+  data_cache: 

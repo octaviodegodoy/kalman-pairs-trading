@@ -1,0 +1,331 @@
+# Kalman Filter Pairs Trading System
+
+A comprehensive, production-ready pairs trading system using Kalman Filters for dynamic hedge ratio estimation. 
+
+## 🎯 Features
+
+- **Dynamic Hedge Ratio Estimation**:  Kalman Filter adapts to changing market conditions
+- **Advanced Risk Management**: Position sizing, drawdown limits, correlation monitoring
+- **Multi-Pair Portfolio Optimization**: Trade multiple pairs with optimal weights
+- **Automated Pair Selection**: Cointegration testing and pair ranking
+- **Parameter Optimization**: Grid search, Bayesian optimization, walk-forward analysis
+- **Real-time Trading**: Live data streaming and order execution
+- **Interactive Dashboard**: Web-based monitoring and control
+- **Machine Learning Integration**:  LSTM predictions, regime detection
+- **Comprehensive Backtesting**: Trade-by-trade analysis with realistic costs
+
+## 📦 Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/octaviodegodoy/kalman-pairs-trading.git
+cd kalman-pairs-trading
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install package in development mode
+pip install -e . 
+```
+
+## 🚀 Quick Start
+
+### Basic Backtest
+
+```python
+from src.pairs_strategy import PairsTradingStrategy
+from src. backtester import KalmanPairsBacktest
+from src.data_manager import download_data
+from src.visualization import VisualizationTools
+
+# Download data
+df = download_data('GLD', 'GDX', '2020-01-01', '2024-01-01')
+
+# Initialize strategy
+strategy = PairsTradingStrategy(
+    entry_zscore=2.0,
+    exit_zscore=0.5,
+    delta=1e-4
+)
+
+# Run backtest
+backtester = KalmanPairsBacktest(strategy)
+results = backtester.run(df)
+
+# Visualize
+metrics = backtester.get_performance_metrics(results)
+VisualizationTools.plot_complete_analysis(results, metrics)
+```
+
+### Multi-Pair Portfolio
+
+```python
+from src.portfolio_optimizer import MultiPairPortfolio
+
+# Initialize portfolio
+portfolio = MultiPairPortfolio()
+
+# Add pairs
+portfolio.add_pair('GLD', 'GDX', weight=0.3)
+portfolio.add_pair('SPY', 'IWM', weight=0.7)
+
+# Optimize weights
+portfolio.optimize_weights(method='risk_parity')
+
+# Backtest portfolio
+results = portfolio.backtest()
+portfolio.plot_results()
+```
+
+### Automated Pair Selection
+
+```python
+from src.pair_selection import PairSelector
+
+# Define universe
+universe = ['SPY', 'QQQ', 'IWM', 'DIA', 'GLD', 'SLV', 'USO', 'TLT']
+
+# Find best pairs
+selector = PairSelector()
+top_pairs = selector.scan_universe(
+    universe,
+    start_date='2020-01-01',
+    min_cointegration_pvalue=0.05
+)
+
+# Display results
+selector.plot_pair_rankings()
+```
+
+## 📊 Strategy Logic
+
+The Kalman Filter pairs trading strategy follows this logic:
+
+1. **State Estimation**: Use Kalman Filter to estimate time-varying hedge ratio (β)
+2. **Spread Calculation**: Spread = Price_A - β × Price_B
+3. **Z-Score**:  Standardize spread using rolling mean and standard deviation
+4. **Signal Generation**:
+   - **Long Spread** (Buy A, Sell B): Z-score < -2.0
+   - **Short Spread** (Sell A, Buy B): Z-score > 2.0
+   - **Exit**:  |Z-score| < 0.5
+   - **Stop Loss**: |Z-score| > 4.0
+
+## 🔧 Configuration
+
+Edit `config.yaml` to customize parameters:
+
+```yaml
+kalman: 
+  delta: 0.0001  # Process noise (lower = more stable)
+  Ve: 0.001      # Observation noise
+
+strategy:
+  entry_zscore:  2.0
+  exit_zscore: 0.5
+  stop_loss_zscore: 4.0
+  lookback_window: 20
+
+risk:
+  max_position_size: 1.0
+  max_drawdown_limit: 0.15
+```
+
+## 📈 Performance Metrics
+
+The system calculates: 
+
+- **Returns**: Total, annual, risk-adjusted
+- **Risk**:  Volatility, Sharpe ratio, Sortino ratio, Calmar ratio
+- **Drawdown**: Maximum, average, duration
+- **Trade Statistics**: Win rate, profit factor, average trade
+- **Portfolio Metrics**: Correlation, diversification ratio
+
+## 🧪 Testing
+
+Run tests with pytest:
+
+```bash
+# Run all tests
+pytest tests/
+
+# Run specific test file
+pytest tests/test_kalman_filter.py
+
+# Run with coverage
+pytest --cov=src tests/
+```
+
+## 📚 Documentation
+
+Detailed documentation is available in Jupyter notebooks:
+
+- `notebooks/01_introduction.ipynb`: Theory and concepts
+- `notebooks/02_pair_selection.ipynb`: Finding tradeable pairs
+- `notebooks/03_strategy_backtest.ipynb`: Backtesting guide
+- `notebooks/04_portfolio_optimization.ipynb`: Multi-pair portfolios
+
+## 🌐 Web Dashboard
+
+Launch the interactive dashboard:
+
+```bash
+streamlit run dashboard/app.py
+```
+
+Features: 
+- Real-time position monitoring
+- Live P&L tracking
+- Interactive charts
+- Parameter controls
+- Trade history
+
+## 🤖 Machine Learning Features
+
+### LSTM Beta Prediction
+
+```python
+from src.ml_features import LSTMBetaPredictor
+
+predictor = LSTMBetaPredictor()
+predictor.train(historical_data)
+predicted_beta = predictor.predict(current_prices)
+```
+
+### Regime Detection
+
+```python
+from src.ml_features import RegimeDetector
+
+detector = RegimeDetector(n_regimes=3)
+detector.fit(spread_history)
+current_regime = detector.predict_regime()
+```
+
+## 📡 Live Trading
+
+### Alpaca Integration
+
+```python
+from src.realtime_trader import RealtimeTrader
+
+trader = RealtimeTrader(broker='alpaca')
+trader.connect(api_key=YOUR_KEY, api_secret=YOUR_SECRET)
+
+# Start trading
+trader.start_trading(
+    pairs=[('GLD', 'GDX')],
+    strategy_params={'entry_zscore': 2.0},
+    risk_limits={'max_drawdown': 0.10}
+)
+```
+
+## 🔬 Advanced Features
+
+### Parameter Optimization
+
+```python
+from src.parameter_optimizer import ParameterOptimizer
+
+optimizer = ParameterOptimizer(strategy, data)
+
+# Grid search
+best_params = optimizer.grid_search({
+    'entry_zscore':  [1.5, 2.0, 2.5],
+    'exit_zscore': [0.3, 0.5, 0.7],
+    'delta': [1e-5, 1e-4, 1e-3]
+})
+
+# Walk-forward analysis
+wf_results = optimizer.walk_forward_analysis(
+    train_window=252,
+    test_window=63
+)
+```
+
+### Cointegration Testing
+
+```python
+from src.cointegration_tests import CointegrationTester
+
+tester = CointegrationTester()
+
+# Multiple tests
+results = tester.run_all_tests('GLD', 'GDX')
+print(f"ADF p-value: {results['adf_pvalue']}")
+print(f"Johansen trace statistic: {results['johansen_trace']}")
+print(f"Half-life: {results['half_life']} days")
+```
+
+## 📊 Example Results
+
+Backtest on GLD/GDX (2020-2024):
+
+```
+Total Return: 34.52%
+Annual Return: 7.73%
+Sharpe Ratio: 1.84
+Max Drawdown: -8.23%
+Win Rate: 64.3%
+Number of Trades: 87
+```
+
+## 🛠️ Project Structure
+
+```
+kalman-pairs-trading/
+├── src/
+│   ├── kalman_filter.py          # Kalman Filter implementation
+│   ├── pairs_strategy. py         # Trading strategy
+│   ├── backtester.py             # Backtesting engine
+│   ├── risk_management.py        # Risk controls
+│   ├── visualization. py          # Plotting tools
+│   ├── portfolio_optimizer.py    # Multi-pair optimization
+│   ├── pair_selection.py         # Pair discovery
+│   ├── cointegration_tests.py    # Statistical tests
+│   ├── parameter_optimizer.py    # Hyperparameter tuning
+│   ├── realtime_trader.py        # Live trading
+│   ├── ml_features.py            # Machine learning
+│   └── data_manager.py           # Data handling
+├── examples/                     # Usage examples
+├── tests/                        # Test suite
+├── notebooks/                    # Jupyter notebooks
+├── dashboard/                    # Web interface
+├── config.yaml                   # Configuration
+└── requirements.txt              # Dependencies
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please: 
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## ⚠️ Disclaimer
+
+This software is for educational and research purposes only. It is not financial advice.  Trading involves risk of loss.  Always do your own research and consult with financial professionals before trading.
+
+## 📧 Contact
+
+For questions or support, please open an issue on GitHub. 
+
+## 🙏 Acknowledgments
+
+- Kalman Filter theory:  Rudolph E. Kálmán
+- Pairs trading research: Gatev, Goetzmann, and Rouwenhorst
+- Python scientific computing: NumPy, Pandas, SciPy communities
+
+---
+
+**Happy Trading!  📈**

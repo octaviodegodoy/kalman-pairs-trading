@@ -1,0 +1,43 @@
+# Kalman Filter Pairs Trading Configuration
+
+# Asset pairs to trade
+pairs:
+  - asset_a: "GLD"
+    asset_b: "GDX"
+    name: "Gold ETF vs Gold Miners"
+  
+  - asset_a: "SPY"
+    asset_b:  "IWM"
+    name: "S&P 500 vs Russell 2000"
+
+# Date range
+start_date: "2020-01-01"
+end_date: "2024-01-01"
+
+# Kalman Filter parameters
+kalman:
+  delta: 0.0001  # Process noise (lower = more stable beta)
+  Ve: 0.001      # Observation noise
+
+# Strategy parameters
+strategy:
+  entry_zscore: 2.0
+  exit_zscore: 0.5
+  stop_loss_zscore: 4.0
+  lookback_window: 20
+  position_size:  1.0
+  transaction_cost: 0.001  # 0.1%
+
+# Risk management
+risk: 
+  max_position_size:  1.0
+  max_portfolio_risk: 0.02
+  max_correlation_threshold:  0.9
+  min_correlation_threshold:  0.3
+  max_drawdown_limit: 0.15
+  volatility_lookback: 20
+
+# Backtesting
+backtest:
+  initial_capital: 100000
+  use_risk_management: true
