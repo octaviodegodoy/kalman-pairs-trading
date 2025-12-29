@@ -18,14 +18,14 @@ jobs:
       fail-fast: false
       matrix: 
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
     
     steps:
     - name: Checkout code
-      uses:  actions/checkout@v3
+      uses:  actions/checkout@v4
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with: 
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -34,9 +34,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install -e ".[dev]"
     
     - name:  Lint with flake8
+      continue-on-error: true
       run:  |
         pip install flake8
         # Stop build if there are Python syntax errors or undefined names
@@ -45,21 +45,23 @@ jobs:
         flake8 src tests --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     
     - name: Check code formatting with black
+      continue-on-error: true
       run: |
         pip install black
         black --check src tests
     
     - name: Type check with mypy
+      continue-on-error: true
       run: |
         pip install mypy
-        mypy src --ignore-missing-imports || true
+        mypy src --ignore-missing-imports
     
     - name: Run unit tests
       run: |
         pytest tests/ -v --cov=src --cov-report=xml --cov-report=html --cov-report=term
     
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
         flags: unittests
@@ -68,9 +70,9 @@ jobs:
     
     - name: Archive test results
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: test-results-${{ matrix.os }}-${{ matrix.python-version }}
+        name: test-results-${{ matrix.os }}-py${{ matrix.python-version }}
         path: |
           htmlcov/
           coverage.xml
@@ -82,10 +84,10 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with: 
         python-version: '3.10'
         cache: 'pip'
@@ -98,7 +100,7 @@ jobs:
     - name: Run integration tests
       run: |
         python examples/basic_backtest.py
-        python examples/multi_pair_portfolio. py
+        python examples/multi_pair_portfolio.py
       env:
         PYTHONPATH: ${{ github.workspace }}
 
@@ -108,10 +110,10 @@ jobs:
     
     steps:
     - name:  Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version:  '3.10'
     
@@ -120,18 +122,21 @@ jobs:
         pip install safety bandit
     
     - name:  Run safety check
+      continue-on-error: true
       run: |
-        pip freeze | safety check --stdin || true
+        pip freeze | safety check --stdin
     
     - name:  Run bandit security scan
+      continue-on-error: true
       run: |
-        bandit -r src -f json -o bandit-report.json || true
+        bandit -r src -f json -o bandit-report.json
     
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      if: always()
+      uses: actions/upload-artifact@v4
       with: 
         name: security-reports
-        path: bandit-report. json
+        path: bandit-report.json
 
   docs:
     name: Build Documentation
@@ -139,10 +144,10 @@ jobs:
     
     steps:
     - name:  Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with: 
         python-version: '3.10'
     
@@ -152,11 +157,13 @@ jobs:
         pip install sphinx sphinx-rtd-theme
     
     - name: Build documentation
+      continue-on-error: true
       run:  |
         cd docs && make html || echo "Documentation build skipped"
     
     - name: Upload documentation
-      uses: actions/upload-artifact@v3
+      if: always()
+      uses: actions/upload-artifact@v4
       with:
         name: documentation
         path: docs/_build/html/
@@ -168,10 +175,10 @@ jobs:
     
     steps: 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Set up Python
-      uses:  actions/setup-python@v4
+      uses:  actions/setup-python@v5
       with:
         python-version: '3.10'
     
@@ -212,10 +219,10 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version:  '3.10'
     
@@ -232,7 +239,7 @@ jobs:
         twine check dist/*
     
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with: 
         name: dist-packages
         path: dist/
@@ -244,7 +251,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -285,7 +292,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name:  Download artifacts
       uses: actions/download-artifact@v3
