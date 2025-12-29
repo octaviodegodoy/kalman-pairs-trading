@@ -100,7 +100,7 @@ jobs:
     - name: Run integration tests
       run: |
         python examples/basic_backtest.py
-        python examples/multi_pair_portfolio.py
+        python examples/parameter_optimization.py
       env:
         PYTHONPATH: ${{ github.workspace }}
 
