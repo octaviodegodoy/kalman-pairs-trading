@@ -10,9 +10,12 @@ import pandas as pd
 import sys
 import os
 
-sys. path.append(os.path. dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add parent directory to path
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
-from src.pairs_strategy import PairsTradingStrategy
+from kalman_pairs_trader import PairsTradingStrategy
 
 
 class TestPairsTradingStrategy(unittest.TestCase):

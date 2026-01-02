@@ -8,7 +8,7 @@ import argparse
 import sys
 from datetime import datetime
 
-from . pairs_strategy import PairsTradingStrategy
+from .pairs_strategy import PairsTradingStrategy
 from .backtester import KalmanPairsBacktest
 from .data_manager import download_data
 from .parameter_optimizer import ParameterOptimizer
