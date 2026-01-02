@@ -73,3 +73,6 @@ docs/_build/
 # OS
 Thumbs.db
 .DS_Store
+
+# Egg info
+kalman_pairs_trading.egg-info/

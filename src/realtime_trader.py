@@ -6,7 +6,7 @@ Real-time trading implementation with broker integration for live pairs trading.
 
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Optional, Callable
+from typing import Dict, List, Optional, Callable, Tuple
 from datetime import datetime, timedelta
 import time
 import threading
@@ -21,6 +21,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
 
 
 class BrokerInterface:
