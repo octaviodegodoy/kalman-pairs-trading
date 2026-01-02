@@ -1,0 +1,4 @@
+[console_scripts]
+kalman-backtest = src.cli:run_backtest
+kalman-optimize = src.cli:optimize_parameters
+kalman-trade = src.cli:start_trading
