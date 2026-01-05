@@ -87,7 +87,7 @@ class TestRiskManager(unittest.TestCase):
         """Test risk limits with good conditions."""
         signal = 1
         spread = pd.Series(np.random.randn(100))
-        cumulative = pd.Series(np.linspace(1. 0, 1.2, 100))
+        cumulative = pd.Series(np.linspace(1.0, 1.2, 100))
         
         adjusted_signal, risk_info = self.risk_manager.apply_risk_limits(
             signal,

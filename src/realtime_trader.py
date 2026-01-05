@@ -252,7 +252,7 @@ class RealtimeTrader:
     
     def start_trading(
         self,
-        pairs: List[Tuple[str, str]],
+        pairs: List[tuple[str, str]],
         update_interval: int = 60
     ):
         """
