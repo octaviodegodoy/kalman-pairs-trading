@@ -21,7 +21,7 @@ class TestRiskManager(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.risk_manager = RiskManager(
-            max_position_size=1. 0,
+            max_position_size=1.0,
             max_drawdown_limit=0.15
         )
         
