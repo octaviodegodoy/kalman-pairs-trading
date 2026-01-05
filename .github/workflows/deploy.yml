@@ -53,11 +53,23 @@ jobs:
         pip install -r requirements.txt
         pip install mkdocs mkdocs-material
     
+    - name: Check if mkdocs.yml exists
+      id: check_mkdocs
+      run: |
+        if [ -f "mkdocs.yml" ]; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "mkdocs.yml not found - skipping documentation build"
+        fi
+    
     - name: Build docs
+      if: steps.check_mkdocs.outputs.exists == 'true'
       run: |
         mkdocs build
     
     - name: Deploy to GitHub Pages
+      if: steps.check_mkdocs.outputs.exists == 'true'
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
